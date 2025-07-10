@@ -2,129 +2,93 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ビンゴ抽選マシン - カジノスタイル</title>
+  <title>ビンゴ抽選 - 音付き</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at center, #000000 0%, #111111 100%);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      overflow-x: hidden;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin: 10px 0 20px;
-      color: #FFD700;
-      text-shadow: 2px 2px 10px #ff0;
+      background: #000;
+      color: #0ff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
     }
     #currentNumber {
       font-size: 6em;
-      font-weight: bold;
-      margin: 30px;
-      color: #00ffff;
-      text-shadow: 0 0 20px #0ff, 0 0 40px #0ff;
-      animation: pulse 0.6s ease-out;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.7); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
+      margin: 40px 0;
+      text-shadow: 0 0 20px #0ff;
     }
     button {
-      background: linear-gradient(145deg, #ff8a00, #e52e71);
-      border: none;
-      padding: 20px 40px;
       font-size: 1.5em;
-      border-radius: 12px;
-      color: white;
+      padding: 15px 30px;
+      background: linear-gradient(to right, #ff0066, #ffcc00);
+      border: none;
+      border-radius: 10px;
+      color: #000;
       cursor: pointer;
-      box-shadow: 0 0 10px #e52e71;
-      transition: all 0.2s ease;
-      margin-bottom: 30px;
+      box-shadow: 0 0 15px #ffcc00;
     }
     button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px #e52e71;
     }
-    #drawnNumbers {
+    .number-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
-      gap: 6px;
-      width: 100%;
+      grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+      gap: 5px;
+      margin-top: 30px;
       max-width: 600px;
+      margin-inline: auto;
     }
-    .number {
-      background: #222;
-      color: #00ffcc;
-      border: 2px solid #0ff;
-      border-radius: 10px;
-      font-size: 1.1em;
-      text-align: center;
+    .num {
+      background: #111;
+      border: 1px solid #0ff;
       padding: 10px 0;
-      box-shadow: 0 0 8px #0ff;
-      animation: pop 0.3s ease-out;
-    }
-    @keyframes pop {
-      0% { transform: scale(0); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    footer {
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: #aaa;
+      border-radius: 5px;
+      font-size: 1.2em;
     }
   </style>
 </head>
 <body>
-  <h1>🎰 ビンゴ抽選マシン 🎰</h1>
+  <h1>🎉 ビンゴ抽選 🎉</h1>
   <div id="currentNumber">--</div>
-  <button onclick="drawNumber()">抽選スタート</button>
-  <div id="drawnNumbers"></div>
-  <footer>© 2025 Bingo Casino</footer>
+  <button id="drawBtn">抽選スタート</button>
+  <div class="number-grid" id="numberGrid"></div>
 
-  <!-- 音声：Pixabayフリー効果音 -->
+  <!-- 音声（Pixabay CDN、CORS問題なし） -->
   <audio id="sound" preload="auto">
     <source src="https://cdn.pixabay.com/download/audio/2022/10/28/audio_9cf932e37e.mp3?filename=magic-transition-2-189276.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    const numbers = Array.from({length: 75}, (_, i) => i + 1);
+    const numbers = Array.from({ length: 75 }, (_, i) => i + 1);
     const drawn = [];
+    const sound = document.getElementById("sound");
 
-    function drawNumber() {
+    document.getElementById("drawBtn").addEventListener("click", () => {
       if (numbers.length === 0) {
-        alert("すべての番号を引き終わりました！");
+        alert("もう全て引きました！");
         return;
       }
 
+      // ランダム抽選
       const index = Math.floor(Math.random() * numbers.length);
       const num = numbers.splice(index, 1)[0];
       drawn.push(num);
 
-      const current = document.getElementById("currentNumber");
-      current.textContent = num;
-      current.style.animation = "none";
-      void current.offsetWidth; // アニメ再起動
-      current.style.animation = "pulse 0.6s ease-out";
+      // 表示更新
+      document.getElementById("currentNumber").textContent = num;
 
-      // 音を鳴らす
-      const sound = document.getElementById("sound");
+      // 音を鳴らす（iOS対応）
       sound.currentTime = 0;
-      sound.play();
+      sound.play().catch(err => {
+        console.warn("音が再生できませんでした:", err);
+      });
 
-      const drawnList = document.getElementById("drawnNumbers");
+      // 番号表示
       const div = document.createElement("div");
-      div.className = "number";
+      div.className = "num";
       div.textContent = num;
-      drawnList.appendChild(div);
-    }
+      document.getElementById("numberGrid").appendChild(div);
+    });
   </script>
 </body>
 </html>
