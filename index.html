@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ビンゴ抽選マシン</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: gold;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin: 10px 0;
+    }
+
+    #currentNumber {
+      font-size: 6em;
+      font-weight: bold;
+      margin: 20px;
+      color: #FFD700;
+      text-shadow: 0 0 10px #FFD700;
+    }
+
+    button {
+      background: gold;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.5em;
+      border-radius: 10px;
+      color: #111;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background: #ffdf00;
+      transform: scale(1.05);
+    }
+
+    #drawnNumbers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+      gap: 5px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .number {
+      background: #222;
+      color: gold;
+      border: 2px solid gold;
+      border-radius: 8px;
+      font-size: 1.2em;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .pop {
+      animation: pop 0.3s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 ビンゴ抽選マシン 🎉</h1>
+  <div id="currentNumber">--</div>
+  <button onclick="drawNumber()">番号を引く</button>
+  <div id="drawnNumbers"></div>
+
+  <audio id="ding" src="https://soundeffect-lab.info/sound/button/mp3/decision22.mp3"></audio>
+
+  <script>
+    const numbers = Array.from({length: 75}, (_, i) => i + 1);
+    let drawn = [];
+
+    function drawNumber() {
+      if (numbers.length === 0) {
+        alert("すべての番号を引き終えました！");
+        return;
+      }
+      const index = Math.floor(Math.random() * numbers.length);
+      const num = numbers.splice(index, 1)[0];
+      drawn.push(num);
+
+      // 音を鳴らす
+      const audio = document.getElementById("ding");
+      audio.currentTime = 0;
+      audio.play();
+
+      // 表示
+      const current = document.getElementById("currentNumber");
+      current.textContent = num;
+      current.classList.remove("pop");
+      void current.offsetWidth; // 再アニメーションのため
+      current.classList.add("pop");
+
+      // グリッドに追加
+      const drawnList = document.getElementById("drawnNumbers");
+      const div = document.createElement("div");
+      div.textContent = num;
+      div.className = "number pop";
+      drawnList.appendChild(div);
+    }
+  </script>
+</body>
+</html>
